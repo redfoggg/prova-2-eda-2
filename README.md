@@ -1,0 +1,10 @@
+Trata-se da resolução da seguinte prova passada na materia Estrutura de Dados e Algoritmos II na Universidade Federal da Bahia.
+
+Questão 1 (2,5 pts). Há diversas definições/abordagens para árvore B na literatura. Em particular, uma delas define a árvore em função de seu grau t, com cada nó sendo capaz de armazenar até 2t-1 registros, tal como visto em sala. Outra define a capacidade do nó como sendo 2d, ou seja, cada nó tem capacidade para armazenar 2d registros. Tanto t quanto d são parâmetros de configuração, que dependem do tamanho do registro físico. Estude estas duas definições, descrevendo as suas principais implicações para os algoritmos de busca/inclusão/remoção. Faça uma análise minuciosa de ambas e apresente como resultado uma dissertação explicando os algoritmos de inserção/busca/remoção, com as variações que encontrou. 
+
+Questão 2 (4,5 pts). Conduza um estudo experimental comparativo entre hash extensível e linear. Para tanto, codifique ambos os métodos, considerando o mesmo tamanho de página (em termos de número de registros). Analise o espaço requerido por ambos os métodos para armazenar n registros e o esforço para inclusão de registros. Para o método hash linear varie o parâmetro alpha^{max} para observar o efeito deste parâmetro no desempenho do método. Para o método hash extensível, use funções hash que permitam um número de bits suficientemente grande para construir o índice (diretório) para os valores de n considerados. Considere valores de n grandes o suficiente para observar tendências. Para as chaves, use um conjunto de inteiros distintos gerado aleatoriamente. 
+
+Questão 3 (3 pts). Realize um estudo experimental sobre filtros de Bloom, verificando a variação de desempenho em função do tamanho do filtro e número de funções hash usadas. Para funções hash use h_i(x) = (a_i x + b_i) mod m, com a_i e b_i escolhidos de forma aleatória. Para as chaves x use um conjunto de inteiros distintos gerado aleatoriamente.
+
+Questão 1 foi resolivida em questao_1/questao_1.md.
+As outras estão nos respectivos arquivos python questao_2.py e questao_3.py.

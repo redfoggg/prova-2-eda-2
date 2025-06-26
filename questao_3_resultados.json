@@ -1,0 +1,255 @@
+{
+  "experiments": [
+    {
+      "size": 1000,
+      "numHashes": 1,
+      "insertTime": 2.246856689453125,
+      "queryTime": 2.096891403198242,
+      "fpRate": 1.0,
+      "fillRatio": 1.0,
+      "truePositives": 10000,
+      "falsePositives": 8967
+    },
+    {
+      "size": 1000,
+      "numHashes": 3,
+      "insertTime": 4.784822463989258,
+      "queryTime": 4.155874252319336,
+      "fpRate": 1.0,
+      "fillRatio": 1.0,
+      "truePositives": 10000,
+      "falsePositives": 8967
+    },
+    {
+      "size": 1000,
+      "numHashes": 5,
+      "insertTime": 6.4258575439453125,
+      "queryTime": 5.781888961791992,
+      "fpRate": 1.0,
+      "fillRatio": 1.0,
+      "truePositives": 10000,
+      "falsePositives": 8967
+    },
+    {
+      "size": 1000,
+      "numHashes": 7,
+      "insertTime": 8.651971817016602,
+      "queryTime": 7.723093032836914,
+      "fpRate": 1.0,
+      "fillRatio": 1.0,
+      "truePositives": 10000,
+      "falsePositives": 8967
+    },
+    {
+      "size": 1000,
+      "numHashes": 10,
+      "insertTime": 11.854887008666992,
+      "queryTime": 10.809183120727539,
+      "fpRate": 1.0,
+      "fillRatio": 1.0,
+      "truePositives": 10000,
+      "falsePositives": 8967
+    },
+    {
+      "size": 5000,
+      "numHashes": 1,
+      "insertTime": 1.7812252044677734,
+      "queryTime": 1.7209053039550781,
+      "fpRate": 0.8699676591948254,
+      "fillRatio": 0.8766,
+      "truePositives": 10000,
+      "falsePositives": 7801
+    },
+    {
+      "size": 5000,
+      "numHashes": 3,
+      "insertTime": 4.050254821777344,
+      "queryTime": 3.7419795989990234,
+      "fpRate": 0.9947585591613695,
+      "fillRatio": 0.9986,
+      "truePositives": 10000,
+      "falsePositives": 8920
+    },
+    {
+      "size": 5000,
+      "numHashes": 5,
+      "insertTime": 5.995035171508789,
+      "queryTime": 5.581140518188477,
+      "fpRate": 1.0,
+      "fillRatio": 1.0,
+      "truePositives": 10000,
+      "falsePositives": 8967
+    },
+    {
+      "size": 5000,
+      "numHashes": 7,
+      "insertTime": 8.082866668701172,
+      "queryTime": 7.51495361328125,
+      "fpRate": 1.0,
+      "fillRatio": 1.0,
+      "truePositives": 10000,
+      "falsePositives": 8967
+    },
+    {
+      "size": 5000,
+      "numHashes": 10,
+      "insertTime": 11.115074157714844,
+      "queryTime": 9.92894172668457,
+      "fpRate": 1.0,
+      "fillRatio": 1.0,
+      "truePositives": 10000,
+      "falsePositives": 8967
+    },
+    {
+      "size": 10000,
+      "numHashes": 1,
+      "insertTime": 1.772165298461914,
+      "queryTime": 1.7199516296386719,
+      "fpRate": 0.6153674584587934,
+      "fillRatio": 0.6484,
+      "truePositives": 10000,
+      "falsePositives": 5518
+    },
+    {
+      "size": 10000,
+      "numHashes": 3,
+      "insertTime": 3.962993621826172,
+      "queryTime": 3.557920455932617,
+      "fpRate": 0.8806735809077729,
+      "fillRatio": 0.9578,
+      "truePositives": 10000,
+      "falsePositives": 7897
+    },
+    {
+      "size": 10000,
+      "numHashes": 5,
+      "insertTime": 5.968809127807617,
+      "queryTime": 5.524873733520508,
+      "fpRate": 0.970893275342924,
+      "fillRatio": 0.9953,
+      "truePositives": 10000,
+      "falsePositives": 8706
+    },
+    {
+      "size": 10000,
+      "numHashes": 7,
+      "insertTime": 7.931947708129883,
+      "queryTime": 7.325887680053711,
+      "fpRate": 0.994535519125683,
+      "fillRatio": 0.9994,
+      "truePositives": 10000,
+      "falsePositives": 8918
+    },
+    {
+      "size": 10000,
+      "numHashes": 10,
+      "insertTime": 11.073827743530273,
+      "queryTime": 9.978771209716797,
+      "fpRate": 1.0,
+      "fillRatio": 1.0,
+      "truePositives": 10000,
+      "falsePositives": 8967
+    },
+    {
+      "size": 20000,
+      "numHashes": 1,
+      "insertTime": 1.7871856689453125,
+      "queryTime": 1.6808509826660156,
+      "fpRate": 0.3392438942790231,
+      "fillRatio": 0.40855,
+      "truePositives": 10000,
+      "falsePositives": 3042
+    },
+    {
+      "size": 20000,
+      "numHashes": 3,
+      "insertTime": 4.013776779174805,
+      "queryTime": 3.062009811401367,
+      "fpRate": 0.5146648823463812,
+      "fillRatio": 0.79095,
+      "truePositives": 10000,
+      "falsePositives": 4615
+    },
+    {
+      "size": 20000,
+      "numHashes": 5,
+      "insertTime": 6.105661392211914,
+      "queryTime": 5.039215087890625,
+      "fpRate": 0.6801605888256942,
+      "fillRatio": 0.9262,
+      "truePositives": 10000,
+      "falsePositives": 6099
+    },
+    {
+      "size": 20000,
+      "numHashes": 7,
+      "insertTime": 7.956981658935547,
+      "queryTime": 6.824254989624023,
+      "fpRate": 0.8281476525036244,
+      "fillRatio": 0.9753,
+      "truePositives": 10000,
+      "falsePositives": 7426
+    },
+    {
+      "size": 20000,
+      "numHashes": 10,
+      "insertTime": 11.124134063720703,
+      "queryTime": 9.703874588012695,
+      "fpRate": 0.9482547117207539,
+      "fillRatio": 0.995,
+      "truePositives": 10000,
+      "falsePositives": 8503
+    },
+    {
+      "size": 50000,
+      "numHashes": 1,
+      "insertTime": 1.7938613891601562,
+      "queryTime": 1.6129016876220703,
+      "fpRate": 0.1052748968439835,
+      "fillRatio": 0.19018,
+      "truePositives": 10000,
+      "falsePositives": 944
+    },
+    {
+      "size": 50000,
+      "numHashes": 3,
+      "insertTime": 3.962993621826172,
+      "queryTime": 2.3038387298583984,
+      "fpRate": 0.14296866287498605,
+      "fillRatio": 0.47006,
+      "truePositives": 10000,
+      "falsePositives": 1282
+    },
+    {
+      "size": 50000,
+      "numHashes": 5,
+      "insertTime": 6.232976913452148,
+      "queryTime": 3.288745880126953,
+      "fpRate": 0.16047730567636892,
+      "fillRatio": 0.65268,
+      "truePositives": 10000,
+      "falsePositives": 1439
+    },
+    {
+      "size": 50000,
+      "numHashes": 7,
+      "insertTime": 7.93910026550293,
+      "queryTime": 4.2476654052734375,
+      "fpRate": 0.19003011040481765,
+      "fillRatio": 0.77126,
+      "truePositives": 10000,
+      "falsePositives": 1704
+    },
+    {
+      "size": 50000,
+      "numHashes": 10,
+      "insertTime": 11.09004020690918,
+      "queryTime": 6.130218505859375,
+      "fpRate": 0.27701572432251587,
+      "fillRatio": 0.87592,
+      "truePositives": 10000,
+      "falsePositives": 2484
+    }
+  ],
+  "summary": {}
+}
