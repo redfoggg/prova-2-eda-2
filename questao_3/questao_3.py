@@ -17,13 +17,11 @@ class BloomFilter:
             })
     
     def _generate_random_prime(self):
-        # Gera um número primo aleatório para melhor distribuição
         primes = [31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
                   101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173]
         return random.choice(primes)
     
     def hash(self, key, i):
-        # h_i(x) = (a_i * x + b_i) mod m
         params = self.hash_params[i]
         return (params['a'] * key + params['b']) % self.size
     
@@ -52,22 +50,19 @@ def measure_time(func):
     start = time.time()
     func()
     end = time.time()
-    return (end - start) * 1000  # Converter para milissegundos
+    return (end - start) * 1000
 
 def run_experiment():
     print("=== Estudo Experimental sobre Filtros de Bloom ===\n")
     
-    # Parâmetros do experimento
     num_elements = 10000
     num_tests = 10000
     filter_sizes = [1000, 5000, 10000, 20000, 50000]
     hash_counts = [1, 3, 5, 7, 10]
     
-    # Gerar conjuntos de chaves
     insert_keys = generate_random_keys(num_elements, num_elements * 10)
     test_keys = generate_random_keys(num_tests, num_elements * 10)
     
-    # Garantir que as chaves de teste não estejam no conjunto de inserção
     insert_set = set(insert_keys)
     negative_test_keys = [key for key in test_keys if key not in insert_set]
     
@@ -86,14 +81,12 @@ def run_experiment():
         for num_hashes in hash_counts:
             bloom = BloomFilter(size, num_hashes)
             
-            # Medir tempo de inserção
             def insert_all():
                 for key in insert_keys:
                     bloom.insert(key)
             
             insert_time = measure_time(insert_all)
             
-            # Medir tempo de consulta e calcular falsos positivos
             false_positives = 0
             def query_all():
                 nonlocal false_positives
@@ -103,7 +96,6 @@ def run_experiment():
             
             query_time = measure_time(query_all)
             
-            # Verificar que todos os elementos inseridos são encontrados
             true_positives = 0
             for key in insert_keys:
                 if bloom.contains(key):
@@ -129,10 +121,8 @@ def run_experiment():
         
         print()
     
-    # Análise adicional
     print("\n=== ANÁLISE DOS RESULTADOS ===\n")
     
-    # Taxa de falsos positivos teórica vs observada
     print("1. COMPARAÇÃO COM TAXA TEÓRICA DE FALSOS POSITIVOS:")
     print("Tamanho\tHashes\tFP Observado\tFP Teórico\tDiferença")
     print("-" * 60)
@@ -142,13 +132,11 @@ def run_experiment():
         m = exp['size']
         n = num_elements
         
-        # Taxa teórica: (1 - e^(-kn/m))^k
         theoretical_fp = math.pow(1 - math.exp(-k * n / m), k)
         difference = abs(exp['fpRate'] - theoretical_fp)
         
         print(f"{m}\t{k}\t{exp['fpRate']*100:.2f}%\t\t{theoretical_fp*100:.2f}%\t\t{difference*100:.2f}%")
     
-    # Análise do número ótimo de funções hash
     print("\n2. NÚMERO ÓTIMO DE FUNÇÕES HASH:")
     print("Tamanho\tK Ótimo Teórico\tK Ótimo Observado\tMenor FP Rate")
     print("-" * 60)
@@ -157,12 +145,10 @@ def run_experiment():
         experiments_for_size = [exp for exp in results['experiments'] if exp['size'] == size]
         best_exp = min(experiments_for_size, key=lambda x: x['fpRate'])
         
-        # k ótimo teórico = (m/n) * ln(2)
         theoretical_optimal_k = round((size / num_elements) * math.log(2))
         
         print(f"{size}\t{theoretical_optimal_k}\t\t{best_exp['numHashes']}\t\t\t{best_exp['fpRate']*100:.2f}%")
     
-    # Análise de desempenho
     print("\n3. ANÁLISE DE DESEMPENHO:")
     print("- Impacto do número de hashes no tempo de inserção:")
     
@@ -173,7 +159,6 @@ def run_experiment():
         avg_insert_time = exp['insertTime'] / num_elements
         print(f"  K={exp['numHashes']}: {avg_insert_time:.4f}ms por inserção")
     
-    # Análise de memória
     print("\n4. EFICIÊNCIA DE MEMÓRIA:")
     print("Tamanho\tBits/Elemento\tFill Ratio Médio")
     print("-" * 45)
@@ -185,13 +170,11 @@ def run_experiment():
         
         print(f"{size}\t{bits_per_element:.2f}\t\t{avg_fill_ratio*100:.1f}%")
     
-    # Trade-offs
     print("\n5. TRADE-OFFS OBSERVADOS:")
     print("- Mais funções hash → Menor taxa de FP, mas maior tempo de operação")
     print("- Filtro maior → Menor taxa de FP, mas maior uso de memória")
     print("- K ótimo observado ≈ K ótimo teórico para a maioria dos casos")
     
-    # Salvar resultados
     with open('questao_3_resultados.json', 'w') as f:
         json.dump(results, f, indent=2)
     print("\nResultados detalhados salvos em 'questao_3_resultados.json'")

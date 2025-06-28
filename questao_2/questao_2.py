@@ -1,6 +1,5 @@
 import random
 import json
-import time
 
 class Page:
     def __init__(self, capacity):
@@ -32,7 +31,6 @@ class ExtensibleHashing:
         self.io_cost = 0
     
     def hash(self, key):
-        # Knuth's multiplicative hash
         h = (key * 2654435761) & 0xFFFFFFFF
         return format(h, '032b')
     
@@ -54,7 +52,6 @@ class ExtensibleHashing:
                 self.io_cost += 1
                 return
             
-            # Página cheia, precisa dividir
             self.io_cost += 1
             
             local_depth = entry['local_depth']
@@ -62,7 +59,6 @@ class ExtensibleHashing:
             if local_depth == self.global_depth:
                 self._double_directory()
             
-            # Criar nova página
             new_page = Page(self.page_capacity)
             self.pages.append(new_page)
             new_page_index = len(self.pages) - 1
@@ -70,25 +66,21 @@ class ExtensibleHashing:
             
             new_local_depth = local_depth + 1
             
-            # Coletar registros para redistribuir
             records_to_redistribute = page.records[:]
             page.records = []
             
-            # Atualizar entradas do diretório
             affected_entries = []
             for d_key, d_entry in self.directory.items():
                 if d_entry['page_index'] == page_index:
                     d_entry['local_depth'] = new_local_depth
                     affected_entries.append(d_key)
             
-            # Determinar quais entradas apontam para a nova página
             discriminator_bit = 32 - new_local_depth
             for d_key in affected_entries:
                 extended_key = d_key.zfill(32)
                 if extended_key[discriminator_bit] == '1':
                     self.directory[d_key]['page_index'] = new_page_index
             
-            # Redistribuir todas as chaves antigas
             for record in records_to_redistribute:
                 h = self.hash(record)
                 dk = self.get_dir_key(h)
@@ -138,7 +130,6 @@ class LinearHashing:
         page = self.pages[page_index]
         self.io_cost += 1
         
-        # Inserção com tratamento de overflow
         current_page = page
         while current_page.is_full():
             if current_page.overflow_page is None:
@@ -164,26 +155,21 @@ class LinearHashing:
         page_to_split = self.pages[self.split_pointer]
         self.io_cost += 1
         
-        # Coletar todos os registros
         all_records = []
         current_page = page_to_split
         while current_page:
             all_records.extend(current_page.records)
             current_page = current_page.overflow_page
         
-        # Limpar a página original
         page_to_split.records = []
         page_to_split.overflow_page = None
         self.io_cost += 1
         
-        # Atualizar ponteiro de split
         self.split_pointer += 1
         
-        # Redistribuir registros
         for record in all_records:
             self._find_page_and_insert(record)
         
-        # Checar se um novo nível começou
         if self.split_pointer == self.num_initial_pages * (2 ** self.level):
             self.level += 1
             self.split_pointer = 0
@@ -211,7 +197,6 @@ def run_experiment():
     n_values = [1000, 2000, 5000, 10000, 20000]
     alpha_max_values = [0.6, 0.75, 0.9]
     
-    # Gerar chaves aleatórias
     max_n = max(n_values)
     keys = generate_random_keys(max_n)
     
@@ -223,7 +208,6 @@ def run_experiment():
     for alpha in alpha_max_values:
         results['linear'][alpha] = {'space': [], 'effort': []}
     
-    # Teste do Hash Extensível
     print("Executando Hash Extensível...")
     print("n\tEspaço\tEsforço(I/O)")
     print("-" * 30)
@@ -236,7 +220,6 @@ def run_experiment():
         results['extensible']['effort'].append(eh.io_cost)
         print(f"{n}\t{eh.get_space_usage()}\t{eh.io_cost}")
     
-    # Teste do Hash Linear
     for alpha in alpha_max_values:
         print(f"\nExecutando Hash Linear (alpha_max={alpha})...")
         print("n\tEspaço\tEsforço(I/O)")
@@ -250,7 +233,6 @@ def run_experiment():
             results['linear'][alpha]['effort'].append(lh.io_cost)
             print(f"{n}\t{lh.get_space_usage()}\t{lh.io_cost}")
     
-    # Análise comparativa
     print("\n=== ANÁLISE COMPARATIVA ===\n")
     
     print("1. ESPAÇO REQUERIDO:")
@@ -279,7 +261,6 @@ def run_experiment():
         ]
         print('\t'.join(map(str, row)))
     
-    # Análise de tendências
     print("\n=== ANÁLISE DE TENDÊNCIAS ===\n")
     
     print("Taxa de crescimento do espaço (relativo a n=1000):")
@@ -298,7 +279,6 @@ def run_experiment():
         ratio7590 = space75 / space90
         print(f"n={n_values[i]}: α(0.6)/α(0.75)={ratio6075:.2f}, α(0.75)/α(0.9)={ratio7590:.2f}")
     
-    # Salvar resultados
     with open('questao_2_resultados.json', 'w') as f:
         json.dump(results, f, indent=2)
     print("\nResultados exportados para 'questao_2_resultados.json'")
