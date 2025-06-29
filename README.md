@@ -7,4 +7,4 @@ Questão 2 (4,5 pts). Conduza um estudo experimental comparativo entre hash exte
 Questão 3 (3 pts). Realize um estudo experimental sobre filtros de Bloom, verificando a variação de desempenho em função do tamanho do filtro e número de funções hash usadas. Para funções hash use h_i(x) = (a_i x + b_i) mod m, com a_i e b_i escolhidos de forma aleatória. Para as chaves x use um conjunto de inteiros distintos gerado aleatoriamente.
 
 Questão 1 foi resolivida em questao_1/questao_1.md.
-As outras estão nos respectivos arquivos python questao_2.py e questao_3.py.
+As outras estão nos respectivos arquivos python questao_2.py e questao_3.py, fiz uma analise dos dados gerados e gerei gráficos para melhor visualização, também em cada pasta há um arquivo README.md explicando como o script principal funciona quais observações/trade-offs forma observados nesses experimentos.
