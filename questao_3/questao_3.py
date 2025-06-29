@@ -170,11 +170,6 @@ def run_experiment():
         
         print(f"{size}\t{bits_per_element:.2f}\t\t{avg_fill_ratio*100:.1f}%")
     
-    print("\n5. TRADE-OFFS OBSERVADOS:")
-    print("- Mais funções hash → Menor taxa de FP, mas maior tempo de operação")
-    print("- Filtro maior → Menor taxa de FP, mas maior uso de memória")
-    print("- K ótimo observado ≈ K ótimo teórico para a maioria dos casos")
-    
     with open('questao_3_resultados.json', 'w') as f:
         json.dump(results, f, indent=2)
     print("\nResultados detalhados salvos em 'questao_3_resultados.json'")

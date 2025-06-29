@@ -13,3 +13,10 @@ O script `questao_3.py` foi projetado para analisar o comportamento do Filtro de
     *   `fillRatio`: A proporção de bits '1' no array de bits do filtro, indicando sua densidade.
     *   `theoretical_fp`: A taxa de falsos positivos teórica, calculada pela fórmula `(1 - e^(-kn/m))^k`, para comparação.
 5.  **Armazenamento**: Todos os resultados e métricas são salvos no arquivo `questao_3_resultados.json`.
+
+## TRADE-OFFS observados:
+Mais funções hash → Menor taxa de FP, mas maior tempo de operação
+
+Filtro maior → Menor taxa de FP, mas maior uso de memória
+
+K ótimo observado ≈ K ótimo teórico para a maioria dos casos
