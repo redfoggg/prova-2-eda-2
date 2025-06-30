@@ -32,8 +32,22 @@ Onde α é a porção de registros que se espera estar representada no filtro.
 $$n_{\text{ótimo}} = \frac{m}{k} \times \ln(2)$$
 
 ## TRADE-OFFS observados:
-Mais funções hash → Menor taxa de FP, mas maior tempo de operação
+### 1. Número de Funções Hash (n) vs Taxa de Falso Positivo
+- **Relação não-monotônica**: A taxa de FP segue uma curva em U
+- **n < n_ótimo**: Taxa de FP decresce conforme n aumenta
+- **n = n_ótimo**: Taxa de FP é mínima $n_{\text{ótimo}} = \frac{m}{k} \times \ln(2)$
+- **n > n_ótimo**: Taxa de FP cresce conforme n aumenta
+- **Trade-off real**: Existe um ponto ótimo que balanceia número de operações e taxa de FP
 
-Filtro maior → Menor taxa de FP, mas maior uso de memória
+### 2. Tamanho do Filtro (m) vs Taxa de Falso Positivo
+- **Relação monotônica**: Maior m → Menor taxa de FP
+- **Trade-off**: Maior m → Menor taxa de FP, mas maior uso de memória
 
-K ótimo observado ≈ K ótimo teórico para a maioria dos casos
+### 3. Tempo de Operação
+- Mais funções hash → Maior tempo de inserção e consulta (linear em n)
+- Trade-off: Precisão vs Velocidade (mas apenas até n_ótimo vale a pena)
+
+### 4. Observações dos Experimentos
+- n_ótimo observado ≈ n_ótimo teórico para a maioria dos casos
+- Para filtros muito densos (k grande relativo a m), o n_ótimo é baixo
+- Para filtros esparsos (k pequeno relativo a m), o n_ótimo é alto
