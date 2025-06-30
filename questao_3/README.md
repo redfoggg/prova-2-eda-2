@@ -1,18 +1,35 @@
-O script `questao_3.py` foi projetado para analisar o comportamento do Filtro de Bloom sob diferentes configurações. O processo é o seguinte:
+## Parâmetros do Filtro de Bloom
 
-1.  **Definição dos Parâmetros**: O experimento é executado para um conjunto de `tamanhos de filtro` (m) e `número de funções hash` (k).
-2.  **Geração de Chaves**: São gerados dois conjuntos de chaves inteiras distintas e aleatórias:
-    *   `insert_keys`: Chaves que serão efetivamente inseridas no filtro.
-    *   `negative_test_keys`: Chaves que garantidamente **não** estão no filtro, usadas para medir a taxa de falsos positivos.
-3.  **Execução e Medição**: Para cada combinação de `tamanho` e `num_hashes`:
-    *   Um novo Filtro de Bloom é criado.
-    *   As `insert_keys` são inseridas, e o tempo de inserção (`insertTime`) é medido.
-    *   O filtro é consultado com as `negative_test_keys`. O tempo de consulta (`queryTime`) e o número de **falsos positivos** são registrados.
-4.  **Cálculo de Métricas**: As seguintes métricas são calculadas:
-    *   `fpRate`: A taxa de falsos positivos (falsos positivos / total de chaves de teste negativas). Esta é a métrica de precisão mais importante.
-    *   `fillRatio`: A proporção de bits '1' no array de bits do filtro, indicando sua densidade.
-    *   `theoretical_fp`: A taxa de falsos positivos teórica, calculada pela fórmula `(1 - e^(-kn/m))^k`, para comparação.
-5.  **Armazenamento**: Todos os resultados e métricas são salvos no arquivo `questao_3_resultados.json`.
+- **m**: número de bits do filtro
+- **n**: número de funções hashing
+- **k**: número de registros representados pelo filtro
+- **α**: percentual esperado do universo de registros que satisfaz os critérios do filtro
+
+Fixei o k nos valores 10 e 100 como visto nos slides das aulas para facilitar o desenvolvimento já que o mesmo não precisava ser alterado.
+
+
+## Fórmulas do Filtro de Bloom
+
+Assumindo que as funções hash distribuem uniformemente as chaves no intervalo [0, m-1]:
+
+### Probabilidades Básicas
+- **$p_1 = \frac{1}{m}$**: Probabilidade de um bit ser ligado por uma função aplicada a um registro
+- **$p_0 = 1 - \frac{1}{m}$**: Probabilidade de um bit permanecer desligado
+
+### Probabilidades Compostas
+- **$p_0^n = \left(1 - \frac{1}{m}\right)^n$**: Probabilidade de um bit estar desligado após aplicar n funções a um registro
+- **$p_0^{nk} = \left(1 - \frac{1}{m}\right)^{nk}$**: Probabilidade de um bit estar desligado após aplicar n funções a k registros
+- **$1 - p_0^{nk} = 1 - \left(1 - \frac{1}{m}\right)^{nk}$**: Probabilidade de um bit estar ligado após todas as inserções
+
+### Probabilidade de Falso Positivo
+$$P = \left(1 - p_0^{nk}\right)^n = \left(1 - \left(1 - \frac{1}{m}\right)^{nk}\right)^n$$
+
+### Probabilidade de Falso Positivo Considerando α
+$$F = (1 - \alpha) \times P$$
+Onde α é a porção de registros que se espera estar representada no filtro.
+
+### Número Ótimo de Funções Hash
+$$n_{\text{ótimo}} = \frac{m}{k} \times \ln(2)$$
 
 ## TRADE-OFFS observados:
 Mais funções hash → Menor taxa de FP, mas maior tempo de operação

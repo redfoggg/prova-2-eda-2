@@ -4,16 +4,20 @@ import time
 import math
 
 class BloomFilter:
-    def __init__(self, size, num_hashes):
-        self.size = size
-        self.num_hashes = num_hashes
-        self.bit_array = [False] * size
+    def __init__(self, m, n):
+        """
+        m: número de bits do filtro
+        n: número de funções hashing
+        """
+        self.m = m
+        self.n = n
+        self.bit_array = [False] * m
         self.hash_params = []
         
-        for _ in range(num_hashes):
+        for _ in range(n):
             self.hash_params.append({
                 'a': self._generate_random_prime(),
-                'b': random.randint(0, size - 1)
+                'b': random.randint(0, m - 1)
             })
     
     def _generate_random_prime(self):
@@ -23,15 +27,15 @@ class BloomFilter:
     
     def hash(self, key, i):
         params = self.hash_params[i]
-        return (params['a'] * key + params['b']) % self.size
+        return (params['a'] * key + params['b']) % self.m
     
     def insert(self, key):
-        for i in range(self.num_hashes):
+        for i in range(self.n):
             index = self.hash(key, i)
             self.bit_array[index] = True
     
     def contains(self, key):
-        for i in range(self.num_hashes):
+        for i in range(self.n):
             index = self.hash(key, i)
             if not self.bit_array[index]:
                 return False
@@ -41,7 +45,7 @@ class BloomFilter:
         return sum(self.bit_array)
     
     def get_fill_ratio(self):
-        return self.get_bit_count() / self.size
+        return self.get_bit_count() / self.m
 
 def generate_random_keys(count, max_val):
     return list(random.sample(range(max_val), count))
@@ -52,127 +56,143 @@ def measure_time(func):
     end = time.time()
     return (end - start) * 1000
 
+def calculate_P_probability(m, n, k):
+    """
+    Calcula a probabilidade P de falso positivo (fórmula exata)
+    P = (1 - (1 - 1/m)^(nk))^n
+    
+    m: número de bits do filtro
+    n: número de funções hashing
+    k: número de registros inseridos
+    """
+    if n == 0:
+        return 0.0
+    p0_nk = math.pow(1 - 1/m, n*k)
+    P = math.pow(1 - p0_nk, n)
+    return P
+
+def calculate_F_probability(P, alpha):
+    """
+    Calcula a probabilidade F de falso positivo considerando α
+    F = (1 - α) * P
+    
+    P: probabilidade de falso positivo
+    α: porção esperada de registros representados
+    """
+    return (1 - alpha) * P
+
+def calculate_optimal_n(m, k):
+    """
+    Calcula o número ótimo de funções hash
+    n_ótimo = (m/k) * ln(2)
+    """
+    return round((m / k) * math.log(2))
+
 def run_experiment():
-    print("=== Estudo Experimental sobre Filtros de Bloom ===\n")
+    k_values = [10, 100]
+    m_values = [1000, 10000, 50000, 100000]
     
-    num_elements = 10000
-    num_tests = 10000
-    filter_sizes = [1000, 5000, 10000, 20000, 50000]
-    hash_counts = [1, 3, 5, 7, 10]
-    
-    insert_keys = generate_random_keys(num_elements, num_elements * 10)
-    test_keys = generate_random_keys(num_tests, num_elements * 10)
-    
-    insert_set = set(insert_keys)
-    negative_test_keys = [key for key in test_keys if key not in insert_set]
+    # Criar ranges de n
+    n_values = list(range(1, 51, 2))  # Para experimentos práticos
+    n_values_theory = list(range(1, 601, 5))  # Para cálculos teóricos
     
     results = {
+        'parameters': {
+            'k_values': k_values,
+            'm_values': m_values,
+            'n_values_exp': n_values,
+            'n_values_theory': n_values_theory
+        },
         'experiments': [],
-        'summary': {}
+        'theory': [],
+        'analysis': {}
     }
     
-    print(f"Inserindo {num_elements} elementos")
-    print(f"Testando com {num_tests} consultas\n")
+    print(f"Valores de k: {k_values}")
+    print(f"Valores de m: {m_values}")
+    print(f"Valores de n para teoria: 1 a 600 (passo 5)\n")
     
-    print("Tamanho\tHashes\tTempo Ins(ms)\tTempo Cons(ms)\tFP Rate\tFill Ratio")
+    print("Calculando valores teóricos...")
+    for k in k_values:
+        for m in m_values:
+            for n in n_values_theory:
+                P = calculate_P_probability(m, n, k)
+                alpha = k / (k * 10)
+                F = calculate_F_probability(P, alpha)
+                
+                results['theory'].append({
+                    'm': m,
+                    'n': n,
+                    'k': k,
+                    'alpha': alpha,
+                    'P': P,
+                    'F': F
+                })
+    
+    print("\nRealizando experimentos práticos para validação...")
+    print("m\tk\tn\tP\t\tFP Obs.\t\tFill Ratio")
     print("-" * 70)
     
-    for size in filter_sizes:
-        for num_hashes in hash_counts:
-            bloom = BloomFilter(size, num_hashes)
+    selected_cases = [
+        (1000, 10),    # Filtro pequeno, poucos registros
+        (1000, 100),   # Filtro pequeno, muitos registros
+        (10000, 100),  # Filtro médio, registros médios
+        (10000, 1000), # Filtro médio, muitos registros
+    ]
+    
+    for m, k in selected_cases:
+        print(f"\n--- m = {m}, k = {k} ---")
+        
+        num_tests = min(1000, k * 10)
+        universe_size = k * 10
+        insert_keys = generate_random_keys(k, universe_size)
+        
+        for n in [1, 5, 10, 20, 50]:
+            bloom = BloomFilter(m, n)
             
-            def insert_all():
-                for key in insert_keys:
-                    bloom.insert(key)
-            
-            insert_time = measure_time(insert_all)
+            for key in insert_keys:
+                bloom.insert(key)
             
             false_positives = 0
-            def query_all():
-                nonlocal false_positives
-                for key in negative_test_keys[:num_tests]:
-                    if bloom.contains(key):
-                        false_positives += 1
+            test_keys = generate_random_keys(num_tests, universe_size)
+            insert_set = set(insert_keys)
+            negative_test_keys = [key for key in test_keys if key not in insert_set]
             
-            query_time = measure_time(query_all)
-            
-            true_positives = 0
-            for key in insert_keys:
+            for key in negative_test_keys[:num_tests]:
                 if bloom.contains(key):
-                    true_positives += 1
+                    false_positives += 1
             
-            fp_rate = false_positives / len(negative_test_keys[:num_tests])
+            fp_rate_observed = false_positives / len(negative_test_keys[:num_tests]) if negative_test_keys else 0
+            P = calculate_P_probability(m, n, k)
             fill_ratio = bloom.get_fill_ratio()
             
             result = {
-                'size': size,
-                'numHashes': num_hashes,
-                'insertTime': insert_time,
-                'queryTime': query_time,
-                'fpRate': fp_rate,
-                'fillRatio': fill_ratio,
-                'truePositives': true_positives,
-                'falsePositives': false_positives
+                'm': m,
+                'n': n,
+                'k': k,
+                'P': P,
+                'fpRateObserved': fp_rate_observed,
+                'fillRatio': fill_ratio
             }
             
             results['experiments'].append(result)
             
-            print(f"{size}\t{num_hashes}\t{insert_time:.2f}\t\t{query_time:.2f}\t\t{fp_rate*100:.2f}%\t{fill_ratio*100:.1f}%")
-        
-        print()
+            print(f"{m}\t{k}\t{n}\t{P:.4f}\t\t{fp_rate_observed:.4f}\t\t{fill_ratio:.3f}")
     
-    print("\n=== ANÁLISE DOS RESULTADOS ===\n")
+    print("VALORES ÓTIMOS DE n:")
+    print("m\tk\tn_ótimo\t\tP_mínimo")
+    print("-" * 50)
     
-    print("1. COMPARAÇÃO COM TAXA TEÓRICA DE FALSOS POSITIVOS:")
-    print("Tamanho\tHashes\tFP Observado\tFP Teórico\tDiferença")
-    print("-" * 60)
-    
-    for exp in results['experiments']:
-        k = exp['numHashes']
-        m = exp['size']
-        n = num_elements
-        
-        theoretical_fp = math.pow(1 - math.exp(-k * n / m), k)
-        difference = abs(exp['fpRate'] - theoretical_fp)
-        
-        print(f"{m}\t{k}\t{exp['fpRate']*100:.2f}%\t\t{theoretical_fp*100:.2f}%\t\t{difference*100:.2f}%")
-    
-    print("\n2. NÚMERO ÓTIMO DE FUNÇÕES HASH:")
-    print("Tamanho\tK Ótimo Teórico\tK Ótimo Observado\tMenor FP Rate")
-    print("-" * 60)
-    
-    for size in filter_sizes:
-        experiments_for_size = [exp for exp in results['experiments'] if exp['size'] == size]
-        best_exp = min(experiments_for_size, key=lambda x: x['fpRate'])
-        
-        theoretical_optimal_k = round((size / num_elements) * math.log(2))
-        
-        print(f"{size}\t{theoretical_optimal_k}\t\t{best_exp['numHashes']}\t\t\t{best_exp['fpRate']*100:.2f}%")
-    
-    print("\n3. ANÁLISE DE DESEMPENHO:")
-    print("- Impacto do número de hashes no tempo de inserção:")
-    
-    size_for_analysis = 10000
-    perf_experiments = [exp for exp in results['experiments'] if exp['size'] == size_for_analysis]
-    
-    for exp in perf_experiments:
-        avg_insert_time = exp['insertTime'] / num_elements
-        print(f"  K={exp['numHashes']}: {avg_insert_time:.4f}ms por inserção")
-    
-    print("\n4. EFICIÊNCIA DE MEMÓRIA:")
-    print("Tamanho\tBits/Elemento\tFill Ratio Médio")
-    print("-" * 45)
-    
-    for size in filter_sizes:
-        experiments_for_size = [exp for exp in results['experiments'] if exp['size'] == size]
-        avg_fill_ratio = sum(exp['fillRatio'] for exp in experiments_for_size) / len(experiments_for_size)
-        bits_per_element = size / num_elements
-        
-        print(f"{size}\t{bits_per_element:.2f}\t\t{avg_fill_ratio*100:.1f}%")
+    for m in [1000, 10000, 50000]:
+        for k in [10, 100, 1000, 10000]:
+            if k <= m:
+                n_optimal = calculate_optimal_n(m, k)
+                P_optimal = calculate_P_probability(m, n_optimal, k)
+                print(f"{m}\t{k}\t{n_optimal}\t\t{P_optimal:.6f}")
     
     with open('questao_3_resultados.json', 'w') as f:
         json.dump(results, f, indent=2)
-    print("\nResultados detalhados salvos em 'questao_3_resultados.json'")
+    print("\nResultados salvos em 'questao_3_resultados.json'")
 
 if __name__ == '__main__':
     run_experiment() 

@@ -1,76 +1,102 @@
 import json
 import matplotlib.pyplot as plt
+import numpy as np
 
-def plot_simple_results():
+def plot_main_analysis():
     with open('questao_3_resultados.json', 'r') as f:
         data = json.load(f)
 
-    experiments = data['experiments']
+    theory = data.get('theory', [])
 
     plt.style.use('seaborn-v0_8-whitegrid')
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7))
-
-    sizes = sorted(list(set(exp['size'] for exp in experiments)))
     
-    ax1.set_title('Taxa de Falsos Positivos vs. Número de Hashes', fontsize=14)
-    ax1.set_xlabel('Número de Funções Hash (k)')
-    ax1.set_ylabel('Taxa de Falsos Positivos (%)')
-
-    colors = ['blue', 'green', 'red', 'purple', 'orange']
-    markers = ['o', 's', '^', 'D', 'v']
-
-    for i, size in enumerate(sizes):
-        size_exps = [exp for exp in experiments if exp['size'] == size]
-        size_exps.sort(key=lambda x: x['numHashes'])
-        
-        num_hashes = [exp['numHashes'] for exp in size_exps]
-        fp_rates = [exp['fpRate'] * 100 for exp in size_exps]
-        
-        ax1.plot(num_hashes, fp_rates,
-                 marker=markers[i], linestyle='-', label=f'Tamanho = {size:,}',
-                 color=colors[i], linewidth=2, markersize=8)
-
-    ax1.legend(title='Tamanho do Filtro')
-    ax1.grid(True, which='both', linestyle='--', linewidth=0.5)
-
-    ax2.set_title('Desempenho vs. Número de Hashes', fontsize=14)
-    ax2.set_xlabel('Número de Funções Hash (k)')
-    ax2.set_ylabel('Tempo de Operação (ms)')
-
-    representative_size = sizes[len(sizes) // 2]
-    size_exps = [exp for exp in experiments if exp['size'] == representative_size]
-    size_exps.sort(key=lambda x: x['numHashes'])
+    plt.figure(figsize=(12, 8))
     
-    num_hashes = [exp['numHashes'] for exp in size_exps]
-    insert_times = [exp['insertTime'] for exp in size_exps]
-    query_times = [exp['queryTime'] for exp in size_exps]
-
-    ax2.plot(num_hashes, insert_times,
-             marker='s', linestyle='--', color='blue', 
-             label=f'Inserção (Tamanho={representative_size:,})', linewidth=2, markersize=8)
-    ax2.plot(num_hashes, query_times,
-             marker='^', linestyle=':', color='green', 
-             label=f'Consulta (Tamanho={representative_size:,})', linewidth=2, markersize=8)
-
-    ax2.legend()
-    ax2.grid(True, which='both', linestyle='--', linewidth=0.5)
-
+    # primeramente testando o comportamento igualzinho ao que está nos slides para validar o código.
+    m_selected = 1000
+    k_values_to_plot = [10, 100]
+    colors = ['blue', 'red']
+    
+    for i, k in enumerate(k_values_to_plot):
+        theory_data = [item for item in theory if item['m'] == m_selected and item['k'] == k]
+        theory_data.sort(key=lambda x: x['n'])
+        
+        if theory_data:
+            n_theory = [0] + [item['n'] for item in theory_data]
+            P_theory = [0.0] + [item['P'] for item in theory_data]
+            
+            plt.plot(n_theory, P_theory, 
+                    color=colors[i], linewidth=2.5,
+                    label=f'k = {k}')
+            
+            n_optimal = round((m_selected / k) * np.log(2))
+            P_optimal = next((item['P'] for item in theory_data if item['n'] == n_optimal), None)
+            
+            if P_optimal is not None:
+                plt.plot(n_optimal, P_optimal, 'o', color=colors[i], markersize=8, 
+                        markeredgecolor='black', markeredgewidth=1.5)
+                plt.annotate(f'ótimo n = {n_optimal}', 
+                            xy=(n_optimal, P_optimal),
+                            xytext=(n_optimal + 50, P_optimal + 0.02),
+                            color=colors[i],
+                            fontsize=11,
+                            arrowprops=dict(arrowstyle='->', color=colors[i], lw=1))
+    
+    plt.xlim(0, 600)
+    plt.ylim(0, 0.30)
+    
+    plt.xlabel('Filtro com n func. hashing', fontsize=12)
+    plt.ylabel('Probabilidade de positivo', fontsize=12)
+    
+    plt.grid(True, alpha=0.3)
+    
+    plt.text(0.5, 1.05, 'Comportamento em função do número n de funções hashing',
+             ha='center', transform=plt.gca().transAxes, fontsize=14, color='blue')
+    plt.text(0.5, 1.02, f'Considerando: m = {m_selected} bits, k ∈ {{{k_values_to_plot[0]}, {k_values_to_plot[1]}}}:',
+             ha='center', transform=plt.gca().transAxes, fontsize=12)
+    
     plt.tight_layout()
-    plt.savefig('analise_bloom_filter.png', dpi=300)
+    plt.savefig('bloom_m1000_comparacao.png', dpi=300, bbox_inches='tight')
+    plt.show()
+    
+    plt.figure(figsize=(14, 10))
+    
+    k_selected = 100
+    m_values = sorted(list(set(item['m'] for item in theory)))
+    colors = plt.cm.viridis(np.linspace(0, 1, len(m_values)))
+    
+    for i, m in enumerate(m_values):
+        theory_data = [item for item in theory if item['m'] == m and item['k'] == k_selected]
+        theory_data.sort(key=lambda x: x['n'])
+        
+        if theory_data:
+            n_theory = [0] + [item['n'] for item in theory_data]
+            P_theory = [0.0] + [item['P'] for item in theory_data]
+            
+            plt.plot(n_theory, P_theory, 
+                    linestyle='-', linewidth=2.5,
+                    label=f'm = {m:,} bits', color=colors[i])
+            
+            n_optimal = round((m / k_selected) * np.log(2))
+            P_optimal = next((item['P'] for item in theory_data if item['n'] == n_optimal), None)
+            
+            if P_optimal is not None and n_optimal <= 600:
+                plt.plot(n_optimal, P_optimal, 'o', markersize=8, color=colors[i], 
+                        markeredgecolor='black', markeredgewidth=1.5)
+    
+    plt.xlim(0, 600)
+    plt.ylim(0, 1.05)
+    
+    plt.xlabel('Número de Funções Hash (n)', fontsize=14)
+    plt.ylabel('Probabilidade de Falso Positivo', fontsize=14)
+    plt.title(f'Probabilidade de Falso Positivo vs Número de Funções Hash\nk = {k_selected} registros', fontsize=16)
+    
+    plt.legend(title='Tamanho do Filtro', fontsize=11, title_fontsize=12, loc='center right')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('bloom_todos_m_k100.png', dpi=300)
     plt.show()
 
-    print("\n=== ANÁLISE DOS RESULTADOS ===\n")
-    
-    print("TAXA DE FALSOS POSITIVOS:")
-    print("- Filtros maiores têm menor taxa de falsos positivos")
-    print("- Existe um número ótimo de hashes para cada tamanho")
-    print("- Muitos hashes podem piorar a taxa (filtro muito denso)")
-    
-    print("\nDESEMPENHO:")
-    print("- O tempo aumenta linearmente com o número de hashes")
-    print("- Inserção e consulta têm tempos similares")
-    
-    print(f"\nGráficos salvos em 'analise_bloom_filter.png'")
-
 if __name__ == '__main__':
-    plot_simple_results() 
+    plot_main_analysis() 
