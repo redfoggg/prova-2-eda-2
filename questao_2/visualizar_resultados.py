@@ -6,7 +6,7 @@ def plot_results():
         data = json.load(f)
 
     plt.style.use('seaborn-v0_8-whitegrid')
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7))
+    _, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7))
 
     n_values = list(range(1000, 1000 + len(data['extensible']['space']) * 1000, 1000))
 
