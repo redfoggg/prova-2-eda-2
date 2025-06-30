@@ -12,7 +12,7 @@ def plot_main_analysis():
     
     plt.figure(figsize=(12, 8))
     
-    # primeramente testando o comportamento igualzinho ao que está nos slides para validar o código.
+    # primeiramente testando o comportamento igualzinho ao que está nos slides para validar o código.
     m_selected = 1000
     k_values_to_plot = [10, 100]
     colors = ['blue', 'red']
